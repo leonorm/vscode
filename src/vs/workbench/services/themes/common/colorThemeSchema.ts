@@ -145,7 +145,8 @@ const textmateColorSchema: IJSONSchema = {
 				},
 				background: {
 					type: 'string',
-					deprecationMessage: nls.localize('schema.token.background.warning', 'Token background colors are currently not supported.')
+					description: nls.localize('schema.token.background', 'Background color for the token.'),
+					format: 'color-hex'
 				},
 				fontStyle: {
 					type: 'string',

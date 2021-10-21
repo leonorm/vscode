@@ -69,10 +69,16 @@ suite('ModelLine - getIndentLevel', () => {
 class TestToken {
 	public readonly startOffset: number;
 	public readonly color: number;
+	public readonly backgroundColor: number;
 
-	constructor(startOffset: number, color: number) {
+	constructor(startOffset: number, color: number, backgroundColor?: number) {
 		this.startOffset = startOffset;
 		this.color = color;
+		if (typeof backgroundColor === 'undefined') {
+			this.backgroundColor = -1;
+		} else {
+			this.backgroundColor = backgroundColor;
+		}
 	}
 
 	public static toTokens(tokens: TestToken[]): Uint32Array;
@@ -85,9 +91,15 @@ class TestToken {
 		for (let i = 0; i < tokensLen; i++) {
 			let token = tokens[i];
 			result[(i << 1)] = token.startOffset;
-			result[(i << 1) + 1] = (
-				token.color << MetadataConsts.FOREGROUND_OFFSET
-			) >>> 0;
+			if (token.backgroundColor === -1) {
+				result[(i << 1) + 1] = (
+					token.color << MetadataConsts.FOREGROUND_OFFSET
+				) >>> 0;
+			} else {
+				result[(i << 1) + 1] = (
+					(token.color << MetadataConsts.FOREGROUND_OFFSET) | (token.backgroundColor << MetadataConsts.BACKGROUND_OFFSET)
+				) >>> 0;
+			}
 		}
 		return result;
 	}
@@ -198,7 +210,7 @@ suite('ModelLinesTokens', () => {
 			[{ range: new Range(1, 1, 1, 12), text: '' }],
 			[{
 				text: '',
-				tokens: [new TestToken(0, 1)]
+				tokens: [new TestToken(0, 1, 2)]
 			}]
 		);
 	});
@@ -362,10 +374,10 @@ suite('ModelLinesTokens', () => {
 			[{ range: new Range(1, 1, 1, 1), text: '\n' }],
 			[{
 				text: '',
-				tokens: [new TestToken(0, 1)]
+				tokens: [new TestToken(0, 1, 2)]
 			}, {
 				text: 'hello world',
-				tokens: [new TestToken(0, 1)]
+				tokens: [new TestToken(0, 1, 2)]
 			}]
 		);
 	});
@@ -382,7 +394,7 @@ suite('ModelLinesTokens', () => {
 				tokens: [new TestToken(0, 1), new TestToken(5, 2), new TestToken(6, 3)]
 			}, {
 				text: '',
-				tokens: [new TestToken(0, 1)]
+				tokens: [new TestToken(0, 1, 2)]
 			}]
 		);
 	});
@@ -399,7 +411,7 @@ suite('ModelLinesTokens', () => {
 				tokens: [new TestToken(0, 1), new TestToken(5, 2)]
 			}, {
 				text: 'world',
-				tokens: [new TestToken(0, 1)]
+				tokens: [new TestToken(0, 1, 2)]
 			}]
 		);
 	});
@@ -419,7 +431,7 @@ suite('ModelLinesTokens', () => {
 				tokens: [new TestToken(0, 1), new TestToken(5, 2)]
 			}, {
 				text: 'yyworld',
-				tokens: [new TestToken(0, 1)]
+				tokens: [new TestToken(0, 1, 2)]
 			}, {
 				text: 'hello world',
 				tokens: [new TestToken(0, 4), new TestToken(5, 5), new TestToken(6, 6)]
@@ -463,7 +475,7 @@ suite('ModelLinesTokens', () => {
 		}]);
 
 		const actualTokens = model.getLineTokens(1);
-		assertLineTokens(actualTokens, [new TestToken(0, 1)]);
+		assertLineTokens(actualTokens, [new TestToken(0, 1, 2)]);
 
 		model.dispose();
 	});
@@ -677,7 +689,7 @@ suite('ModelLinesTokens', () => {
 			}],
 			'a',
 			[
-				new TestToken(0, 1)
+				new TestToken(0, 1, 2)
 			]
 		);
 	});
@@ -867,7 +879,7 @@ suite('ModelLinesTokens', () => {
 			}],
 			'',
 			[
-				new TestToken(0, 1)
+				new TestToken(0, 1, 2)
 			]
 		);
 	});
@@ -1005,7 +1017,7 @@ suite('ModelLinesTokens', () => {
 				tokens: expectedTokens
 			}, {
 				text: expectedText2,
-				tokens: [new TestToken(0, 1)]
+				tokens: [new TestToken(0, 1, 2)]
 			}]
 		);
 	}
@@ -1022,7 +1034,7 @@ suite('ModelLinesTokens', () => {
 			'',
 			'abcd efgh',
 			[
-				new TestToken(0, 1),
+				new TestToken(0, 1, 2),
 			]
 		);
 	});

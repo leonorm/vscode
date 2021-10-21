@@ -409,7 +409,8 @@ export function generateTokensCSSForColorMap(colorMap: readonly Color[]): string
 	let rules: string[] = [];
 	for (let i = 1, len = colorMap.length; i < len; i++) {
 		let color = colorMap[i];
-		rules[i] = `.mtk${i} { color: ${color}; }`;
+		rules.push(`.mtk${i} { color: ${color}; }`);
+		rules.push(`.mtkbg${i} { background-color: ${color}; }`);
 	}
 	rules.push('.mtki { font-style: italic; }');
 	rules.push('.mtkb { font-weight: bold; }');

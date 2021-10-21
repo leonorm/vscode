@@ -137,6 +137,11 @@ export class TokenMetadata {
 		let foreground = this.getForeground(metadata);
 		let className = 'mtk' + foreground;
 
+		let background = this.getBackground(metadata);
+		if (background) {
+			className += ' mtkbg' + background;
+		}
+
 		let fontStyle = this.getFontStyle(metadata);
 		if (fontStyle & FontStyle.Italic) {
 			className += ' mtki';
